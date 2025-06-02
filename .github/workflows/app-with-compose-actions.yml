@@ -1,9 +1,12 @@
 name: App With Github Actions with docker-compose CI/CD
+
 on:
-  workflow_dispatch
+  push
+
 jobs:
   ci:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -20,16 +23,19 @@ jobs:
       shell: bash
       
     - name: Build with Maven
-      run: mvn -B package -DskipTests --file pom.xml
+      run: mvn -B package --file pom.xml
       
     - name: Naming jar file
       run: mv ./target/*.jar ./target/app.jar
+
     - name: Check jar file
       run: ls ./target
+
     - uses: actions/upload-artifact@v4
       with:
         name: app
         path: ./target/*.jar
+
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -52,17 +58,16 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4  # 이것도 추가해야 함!
-    
+
     - name: Copy docker-compose.yml to server
-      uses: appleboy/scp-action@v0.1.7  # 여기 들여쓰기 수정
-      with:  # 여기 들여쓰기 수정
+      uses: appleboy/scp-action@v0.1.7
+      with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         source: "docker-compose.yml"
         target: "/home/ubuntu/"
-      
+    
     - name: Execute deployment script
       uses: appleboy/ssh-action@v1.2.0
       with:
@@ -70,8 +75,8 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          cd /home/ubuntu  # cd만 하지 말고 경로 명시
-          sudo docker-compose down
-          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/app-with-actions:latest
-          sudo docker-compose up -d
-          sudo docker image prune -a -f
+            cd
+            sudo docker-compose down
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/app-with-actions
+            sudo docker-compose up -d
+            sudo docker image prune -a -f
