@@ -1,0 +1,13 @@
+fruits:
+  - orange
+  - apple
+  - banana
+---
+lectures:
+  - java
+  - db
+  - html
+  - css
+  - javascript
+  - springboot
+---
