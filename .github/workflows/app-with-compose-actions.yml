@@ -58,15 +58,6 @@ jobs:
     needs: ci
     runs-on: ubuntu-latest
     steps:
-
-    - name: Copy docker-compose.yml to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "docker-compose.yml"
-        target: "/home/ubuntu/"
     
     - name: Execute deployment script
       uses: appleboy/ssh-action@v1.2.0
